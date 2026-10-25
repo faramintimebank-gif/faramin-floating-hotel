@@ -1,5 +1,60 @@
-const toggle=document.getElementById('langToggle');let english=false;
-const fa={title:'هتل شناور فرامین | چشم‌انداز گردشگری آبی',nav:['پروژه','رویکرد','مسیر اجرا','همکاری'],eyebrow:'FARAMIN • FLOATING HOSPITALITY CONCEPT',heading:'افق تازه‌ای برای<br><span>گردشگری آبی و اقامت</span>',lead:'هتل شناور فرامین، مفهومی برای بررسی ظرفیت‌های اقامت، تفریح و تجربه گردشگری در پیوند با پهنه‌های آبی است؛ با تأکید بر امکان‌سنجی، طراحی مسئولانه و توسعه مرحله‌ای.',buttons:['آشنایی با پروژه','گفت‌وگوی همکاری']};
-const en={title:'Faramin Floating Hotel | Blue Tourism Concept',nav:['Project','Approach','Roadmap','Cooperation'],eyebrow:'FARAMIN • FLOATING HOSPITALITY CONCEPT',heading:'A new horizon for<br><span>waterfront hospitality</span>',lead:'Faramin Floating Hotel is a concept to explore hospitality, recreation and tourism experiences connected to aquatic environments, with an emphasis on feasibility, responsible design and phased development.',buttons:['Explore the concept','Discuss cooperation']};
-toggle.addEventListener('click',()=>{english=!english;document.documentElement.lang=english?'en':'fa';document.documentElement.dir=english?'ltr':'rtl';document.body.classList.toggle('en',english);toggle.textContent=english?'FA':'EN';const d=english?en:fa;document.title=d.title;document.querySelectorAll('nav a').forEach((a,i)=>a.textContent=d.nav[i]);document.querySelector('.hero .eyebrow').textContent=d.eyebrow;document.querySelector('.hero h1').innerHTML=d.heading;document.querySelector('.lead').textContent=d.lead;document.querySelectorAll('.actions a').forEach((a,i)=>a.textContent=d.buttons[i]);});
-document.getElementById('year').textContent=new Date().getFullYear();
+(() => {
+  "use strict";
+  const toggle = document.getElementById("langToggle");
+  const savedLangKey = "faramin-language";
+  const menuToggle = document.getElementById("menuToggle");
+  const mainNav = document.getElementById("mainNav");
+  const setLanguage = (lang) => {
+    const english = lang === "en";
+    document.documentElement.lang = english ? "en" : "fa";
+    document.documentElement.dir = english ? "ltr" : "rtl";
+    document.body.classList.toggle("en", english);
+    document.querySelectorAll("[data-fa][data-en]").forEach((node) => {
+      const value = node.dataset[english ? "en" : "fa"];
+      if (value !== undefined) node.innerHTML = value;
+    });
+    document.title = english
+      ? "Faramin Floating Hotel | Sustainable Tourism Concept"
+      : "هتل شناور فرامین | چشم‌انداز گردشگری پایدار";
+    toggle.textContent = english ? "FA" : "EN";
+    toggle.setAttribute("aria-pressed", english ? "true" : "false");
+    toggle.setAttribute("aria-label", english ? "تغییر زبان به فارسی" : "Switch language to English");
+    try { localStorage.setItem(savedLangKey, lang); } catch (_) { /* storage may be disabled */ }
+  };
+
+  menuToggle.addEventListener("click", () => {
+    const open = menuToggle.getAttribute("aria-expanded") !== "true";
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.textContent = open ? (document.documentElement.lang === "en" ? "Close" : "بستن منو") : (document.documentElement.lang === "en" ? "Menu" : "منو");
+    mainNav.classList.toggle("is-open", open);
+  });
+
+  toggle.addEventListener("click", () => {
+    const next = document.documentElement.lang === "fa" ? "en" : "fa";
+    setLanguage(next);
+  });
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+
+  // Use the saved preference when available; default remains Persian/RTL.
+  try {
+    const saved = localStorage.getItem(savedLangKey);
+    if (saved === "en") setLanguage("en");
+  } catch (_) { /* no persistent storage required */ }
+
+  // In-page navigation remains native anchors; no fake forms or backend claims.
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const id = link.getAttribute("href").slice(1);
+      const target = document.getElementById(id);
+      if (!target) {
+        event.preventDefault();
+        console.warn("Missing in-page target:", id);
+      } else {
+        mainNav.classList.remove("is-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.textContent = document.documentElement.lang === "en" ? "Menu" : "منو";
+      }
+    });
+  });
+})();
