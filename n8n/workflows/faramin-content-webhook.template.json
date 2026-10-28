@@ -1,0 +1,61 @@
+{
+  "name": "FARAMIN - Content Webhook (Template)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "faramin-content-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "faramin-webhook-trigger",
+      "name": "Receive approved content event",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "webhookId": "faramin-content-review-template"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { received: true, status: 'review_required', message: 'Event received. No public post was made.' } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "faramin-response",
+      "name": "Acknowledge - no auto-publishing",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Receive approved content event": {
+      "main": [
+        [
+          {
+            "node": "Acknowledge - no auto-publishing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "faramin-content-webhook-template-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
